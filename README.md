@@ -1,21 +1,28 @@
-﻿
-# TaskFlow
+# Task Management System (Trello-like)
 
-TaskFlow is a Trello-like task management system.
+## 📌 Description
+This project is a REST API for a task management system similar to Trello.  
+It allows users to manage boards, columns, tasks, and users.
 
-## Structure
-- backend (Golang, Gin, PostgreSQL)
-- frontend (React, Vite)
+The backend is built using **Go (Golang)** with **Gin framework**,  
+and uses **PostgreSQL** as a database with **GORM ORM**.
 
-## Features
-- User authentication
-- Boards
-- Columns
-- Tasks
-- Deadlines
-- Status management
+---
 
-## Tech Stack
-- Golang (Gin)
+## 🚀 Technologies Used
+
+- Go (Golang)
+- Gin (Web Framework)
 - PostgreSQL
-- React
+- GORM (ORM)
+- Docker (for database)
+
+---
+
+## ⚙️ How to Run the Project
+
+### 1. Clone repository
+
+```bash
+git clone https://github.com/bak09/Task-Management-System-Trello-like-
+cd backend

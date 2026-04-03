@@ -2,57 +2,57 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
+
+	"taskmanager/config"
+	"taskmanager/models"
 
 	"github.com/gin-gonic/gin"
 )
 
-var Tasks = []gin.H{}
-var nextTaskID = 1
-
 func CreateTask(c *gin.Context) {
-	var task map[string]interface{}
+	var task models.Task
 
 	if err := c.ShouldBindJSON(&task); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid json"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	task["id"] = nextTaskID
-	nextTaskID++
+	if task.Title == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "title is required"})
+		return
+	}
 
-	Tasks = append(Tasks, task)
-
+	config.DB.Create(&task)
 	c.JSON(http.StatusCreated, task)
 }
 
 func GetTasks(c *gin.Context) {
-	c.JSON(http.StatusOK, Tasks)
+	var tasks []models.Task
+	config.DB.Find(&tasks)
+	c.JSON(http.StatusOK, tasks)
 }
 
 func GetTaskByID(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id := c.Param("id")
 
-	for _, task := range Tasks {
-		if int(task["id"].(int)) == id {
-			c.JSON(http.StatusOK, task)
-			return
-		}
+	var task models.Task
+	if err := config.DB.First(&task, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+		return
 	}
 
-	c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+	c.JSON(http.StatusOK, task)
 }
 
 func DeleteTask(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id := c.Param("id")
 
-	for i, task := range Tasks {
-		if int(task["id"].(int)) == id {
-			Tasks = append(Tasks[:i], Tasks[i+1:]...)
-			c.JSON(http.StatusOK, gin.H{"message": "deleted"})
-			return
-		}
+	var task models.Task
+	if err := config.DB.First(&task, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+		return
 	}
 
-	c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+	config.DB.Delete(&task)
+	c.JSON(http.StatusOK, gin.H{"message": "task deleted"})
 }

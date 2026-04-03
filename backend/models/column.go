@@ -1,11 +1,7 @@
 package models
 
-type Task struct {
-	ID          int    `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
-	BoardID     int    `json:"board_id"`
-	ColumnID    int    `json:"column_id"`
-	UserID      int    `json:"user_id"`
+type Column struct {
+	ID      int    `json:"id" gorm:"primaryKey"`
+	Title   string `json:"title" gorm:"not null"`
+	BoardID int    `json:"board_id"`
 }

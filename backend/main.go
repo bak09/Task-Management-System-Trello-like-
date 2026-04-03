@@ -3,11 +3,15 @@ package main
 import (
 	"net/http"
 
+	"taskmanager/config"
 	"taskmanager/handlers"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	config.ConnectDB()
+
 	r := gin.Default()
 
 	r.GET("/", func(c *gin.Context) {

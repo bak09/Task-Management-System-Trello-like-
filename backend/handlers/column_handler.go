@@ -3,28 +3,26 @@ package handlers
 import (
 	"net/http"
 
+	"taskmanager/config"
+	"taskmanager/models"
+
 	"github.com/gin-gonic/gin"
 )
 
-var Columns = []gin.H{}
-var nextColumnID = 1
-
 func CreateColumn(c *gin.Context) {
-	var column map[string]interface{}
+	var column models.Column
 
 	if err := c.ShouldBindJSON(&column); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid json"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	column["id"] = nextColumnID
-	nextColumnID++
-
-	Columns = append(Columns, column)
-
+	config.DB.Create(&column)
 	c.JSON(http.StatusCreated, column)
 }
 
 func GetColumns(c *gin.Context) {
-	c.JSON(http.StatusOK, Columns)
+	var columns []models.Column
+	config.DB.Find(&columns)
+	c.JSON(http.StatusOK, columns)
 }

@@ -3,28 +3,31 @@ package handlers
 import (
 	"net/http"
 
+	"taskmanager/config"
+	"taskmanager/models"
+
 	"github.com/gin-gonic/gin"
 )
 
-var Users = []gin.H{}
-var nextUserID = 1
-
 func CreateUser(c *gin.Context) {
-	var user map[string]interface{}
+	var user models.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid json"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user["id"] = nextUserID
-	nextUserID++
+	if user.Name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "name required"})
+		return
+	}
 
-	Users = append(Users, user)
-
+	config.DB.Create(&user)
 	c.JSON(http.StatusCreated, user)
 }
 
 func GetUsers(c *gin.Context) {
-	c.JSON(http.StatusOK, Users)
+	var users []models.User
+	config.DB.Find(&users)
+	c.JSON(http.StatusOK, users)
 }

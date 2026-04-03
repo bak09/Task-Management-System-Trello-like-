@@ -3,28 +3,26 @@ package handlers
 import (
 	"net/http"
 
+	"taskmanager/config"
+	"taskmanager/models"
+
 	"github.com/gin-gonic/gin"
 )
 
-var Boards = []gin.H{}
-var nextBoardID = 1
-
 func CreateBoard(c *gin.Context) {
-	var board map[string]interface{}
+	var board models.Board
 
 	if err := c.ShouldBindJSON(&board); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid json"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	board["id"] = nextBoardID
-	nextBoardID++
-
-	Boards = append(Boards, board)
-
+	config.DB.Create(&board)
 	c.JSON(http.StatusCreated, board)
 }
 
 func GetBoards(c *gin.Context) {
-	c.JSON(http.StatusOK, Boards)
+	var boards []models.Board
+	config.DB.Find(&boards)
+	c.JSON(http.StatusOK, boards)
 }
